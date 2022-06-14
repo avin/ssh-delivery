@@ -1,0 +1,52 @@
+{
+  "name": "ssh-delivery",
+  "version": "0.1.0",
+  "author": "Avin Lambrero",
+  "main": "./dist/index.js",
+  "bin": {
+    "d": "./dist/cli.js",
+    "delivery": "./dist/cli.js"
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node ./src/cli.ts",
+    "prepublishOnly": "npm run build",
+    "format": "prettier --write \"**/*.{js,ts,md,cjs}\" -c"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avin/ssh-delivery.git"
+  },
+  "keywords": [
+    "ssh",
+    "sftp",
+    "upload"
+  ],
+  "devDependencies": {
+    "@types/node": "^17.0.42",
+    "@types/ssh2": "^0.5.52",
+    "@types/tar": "^6.1.1",
+    "@types/yargs": "^17.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "eslint": "^8.17.0",
+    "prettier": "^2.6.2",
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
+  },
+  "volta": {
+    "node": "16.13.2"
+  },
+  "dependencies": {
+    "@types/revalidator": "^0.3.8",
+    "revalidator": "^0.3.1",
+    "ssh2": "^1.11.0",
+    "tar": "^6.1.11",
+    "yargs": "^17.5.1"
+  }
+}
