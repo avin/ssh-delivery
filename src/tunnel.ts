@@ -106,8 +106,9 @@ function createTunnel(configArgs: Partial<TunnelConfig>): Promise<Server> {
       };
       const server = createServer(config);
 
-      server.listen(config.localPort, config.localHost);
-      resolve(server);
+      server.listen(config.localPort, config.localHost, () => {
+        resolve(server);
+      });
     } catch (error) {
       const server = new events.EventEmitter();
       setImmediate(() => {

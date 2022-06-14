@@ -36,7 +36,7 @@ export class Delivery {
       throw new Error('unknown dst server');
     }
 
-    if (taskOptions.before) {
+    if (taskOptions.before?.run) {
       await this.runShellCommands(taskOptions.before.run);
     }
 
