@@ -24,7 +24,7 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = {
-  // SSH servers (full server options list see at https://github.com/mscdex/ssh2#client-methods `connect` method config)
+  // SSH servers (all server options see at https://github.com/mscdex/ssh2#client-methods `connect` method)
   // Upload destination servers should support SFTP. Gateway servers should support port forwarding.
   servers: {
     gate: {
@@ -73,7 +73,7 @@ module.exports = {
 
 You can keep servers options secure in your home directory. Create `$HOME/.delivery.js` with content like this:
 
-```sh
+```js
 const fs = require('fs');
 const os = require('os');
 const path = require('path');

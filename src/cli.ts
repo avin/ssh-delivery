@@ -29,8 +29,6 @@ void (async () => {
       ...argvConfig,
     ];
 
-    console.log(configPaths);
-
     const config = (() => {
       let configObj: DeliveryOptions = {
         servers: {},
@@ -43,7 +41,6 @@ void (async () => {
         if (!fs.existsSync(configPath)) {
           continue;
         }
-        console.log('+++++', require(path.resolve(configPath)));
         configObj = merge(configObj, require(path.resolve(configPath)) as Partial<DeliveryOptions>);
         someConfigFound = true;
       }
