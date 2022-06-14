@@ -10,10 +10,17 @@ npm install -g ssh-delivery
 
 ## Configure
 
-Create config with tasks and servers declaration. Default config file name `.delivery.js`
+Create config with tasks and servers declaration. Default config file names :
+
+```
+$HOME/.deliveryrc
+$HOME/.delivery.js
+./.deliveryrc
+./.delivery.js
+```
 
 ```js
-const { readFileSync } = require('fs');
+const fs = require('fs');
 const path = require('path');
 
 module.exports = {
@@ -30,7 +37,7 @@ module.exports = {
       host: 'myweb.com',
       port: 41022,
       username: 'root',
-      privateKey: readFileSync(path.resolve(__dirname, './key')),
+      privateKey: fs.readFileSync(path.resolve(os.homedir(), '.ssh', 'id_rsa')),
       passphrase: 'secret',
       via: 'gate', // Connection to this server will be made via 'gate' server
     },
@@ -63,6 +70,37 @@ module.exports = {
   },
 };
 ```
+
+You can keep servers options secure in your home directory. Create `$HOME/.delivery.js` with content like this:
+
+```sh
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+
+module.exports = {
+  servers: {
+    gate: {
+      alias: 'gate',
+      host: 'gate.myweb.com',
+      username: 'root',
+      password: 'secret',
+    },
+    web: {
+      host: 'myweb.com',
+      port: 41022,
+      username: 'root',
+      privateKey: fs.readFileSync(path.resolve(os.homedir(), '.ssh', 'id_rsa')),
+      passphrase: 'secret',
+      via: 'gate', // Connection to this server will be made via 'gate' server
+    },
+  },
+}
+```
+
+and use serves `gate` and `web` in your separate configs without redeclaration.
+
+## Run
 
 Run `static` task with
 

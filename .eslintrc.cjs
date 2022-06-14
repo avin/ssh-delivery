@@ -11,7 +11,8 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   rules: {
-    "@typescript-eslint/no-var-requires": 0,
+    'no-empty': 0,
+    '@typescript-eslint/no-var-requires': 0,
     '@typescript-eslint/no-unused-vars': [1, { args: 'none', ignoreRestSiblings: true }],
   },
 };
