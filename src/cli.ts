@@ -9,12 +9,7 @@ import yargs from 'yargs/yargs';
 import { validateConfig } from './validation';
 import merge from 'lodash/merge';
 
-const defaultConfigNames = [
-  '.deliveryrc',
-  '.deliveryrc.js',
-  '.delivery.config.js',
-  'delivery.config.js',
-];
+const defaultConfigNames = ['.deliveryrc', '.deliveryrc.js', '.delivery.config.js', 'delivery.config.js'];
 
 void (async () => {
   try {
@@ -54,7 +49,7 @@ void (async () => {
 
       const validationResult = validateConfig(configObj);
       if (!validationResult.valid) {
-        console.log(validationResult.errors);
+        console.warn(validationResult.errors);
         throw new Error('Wrong config');
       }
 
@@ -63,7 +58,7 @@ void (async () => {
 
     const delivery = new Delivery(config);
     await delivery.run(taskName);
-    console.log('*** Delivery successfully done! ***');
+    console.info('*** Delivery successfully done! ***');
   } catch (e) {
     console.error('!!!', (e as Error)?.message || e);
     process.exit(1);

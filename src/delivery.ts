@@ -14,6 +14,7 @@ export class Delivery {
   constructor(options: DeliveryOptions) {
     Object.keys(options.servers).forEach((key) => {
       options.servers[key].name = key;
+      options.servers[key].port ||= 22;
     });
     Object.keys(options.tasks).forEach((key) => {
       options.tasks[key].name = key;

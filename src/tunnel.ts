@@ -97,10 +97,10 @@ function createTunnel(configArgs: Partial<TunnelConfig>): Promise<Server> {
         port: 22,
         srcPort: 0,
         srcHost: '127.0.0.1',
-        dstPort: 0,
         dstHost: '127.0.0.1',
+        dstPort: 22,
         localHost: '127.0.0.1',
-        localPort: configArgs.dstPort || 0,
+        localPort: 0,
         agent: env.SSH_AUTH_SOCK,
         ...configArgs,
       };
