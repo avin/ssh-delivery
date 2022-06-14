@@ -49,9 +49,6 @@ void (async () => {
         throw new Error('Config not found');
       }
 
-      console.log(configObj);
-      process.exit(0);
-
       const validationResult = validateConfig(configObj);
       if (!validationResult.valid) {
         console.log(validationResult.errors);
