@@ -225,9 +225,11 @@ export class Delivery {
       sshConnection.exec(
         `\
 mkdir -p ${dstPath} && \
-tar zxf ${archivePath} -C ${dstPath} && \
-rm ${archivePath} && \
-chmod -R 777 ${dstPath} && \
+umask 0000 && \
+mkdir -p ${archivePath}_extr
+tar zxf ${archivePath} -C ${archivePath}_extr && \
+cp ${archivePath}_extr/* ${dstPath} && \
+rm ${archivePath}* -rf &&
 echo ${dstPath} && \
 ls -alh ${dstPath} \
 `,
