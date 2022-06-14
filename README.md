@@ -13,10 +13,10 @@ npm install -g ssh-delivery
 Create config with tasks and servers declaration. Default config file names :
 
 ```
-$HOME/.deliveryrc
-$HOME/.delivery.js
-./.deliveryrc
-./.delivery.js
+.deliveryrc
+.deliveryrc.js
+.delivery.js
+.delivery.config.js
 ```
 
 ```js

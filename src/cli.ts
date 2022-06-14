@@ -9,10 +9,12 @@ import yargs from 'yargs/yargs';
 import { validateConfig } from './validation';
 import merge from 'lodash/merge';
 
+const defaultConfigNames = ['.deliveryrc', '.deliveryrc.js', '.delivery.js', '.delivery.config.js'];
+
 void (async () => {
   try {
     const argv = await yargs(process.argv.slice(2)).options({
-      config: { type: 'string', alias: 'c', default: ['./.deliveryrc', './.delivery.js'] },
+      config: { type: 'string', alias: 'c', default: defaultConfigNames },
     }).argv;
 
     const argvConfig = (() => {
@@ -23,11 +25,7 @@ void (async () => {
     })();
 
     const taskName = argv._[0] as string;
-    const configPaths = [
-      path.resolve(os.homedir(), '.deliveryrc'),
-      path.resolve(os.homedir(), '.delivery.js'),
-      ...argvConfig,
-    ];
+    const configPaths = [...defaultConfigNames.map((fileName) => path.resolve(os.homedir(), fileName)), ...argvConfig];
 
     const config = (() => {
       let configObj: DeliveryOptions = {
