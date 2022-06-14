@@ -15,8 +15,8 @@ Create config with tasks and servers declaration. Default config file names :
 ```
 .deliveryrc
 .deliveryrc.js
-.delivery.js
 .delivery.config.js
+delivery.config.js
 ```
 
 ```js
