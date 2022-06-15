@@ -7,7 +7,7 @@ import path from 'path';
 import fs from 'fs';
 import * as tar from 'tar';
 import { makeRandomFileName } from './utils/string';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 
 export class Delivery {
   private options!: DeliveryOptions;
@@ -67,22 +67,32 @@ export class Delivery {
     if (typeof commands === 'string') {
       commands = [commands];
     }
+    const line1 = '================================';
+    const line2 = '--------------------------------';
     for (const command of commands) {
+      console.info(`${line1}\n• Run: ${command}\n${line2}`);
       await new Promise<void>((resolve, reject) => {
-        console.log(`Run: ${command}`);
-        exec(command, (err, stdout, stderr) => {
-          if (err) {
-            return reject();
-          }
-          if (stderr) {
-            console.error(`stderr: ${stderr}`);
-            return;
-          }
-          console.log(`stdout: ${stdout}`);
+        const [mainCommand, ...args] = command.split(' ');
 
-          return resolve();
+        const proc = spawn(mainCommand, args);
+
+        proc.stdout.on('data', function (data) {
+          console.info('\x1b[1m', (data as Buffer).toString(), '\x1b[0m');
+        });
+
+        proc.stderr.on('data', function (data) {
+          console.error('\x1b[31m', (data as Buffer).toString(), '\x1b[0m');
+        });
+
+        proc.on('exit', function (code) {
+          if (code === 0) {
+            resolve();
+          } else {
+            reject();
+          }
         });
       });
+      console.info(`${line1}\n\n`);
     }
   }
 
@@ -91,6 +101,8 @@ export class Delivery {
    * @param serverOptions
    */
   async createSshConnection(serverOptions: ServerOptions): Promise<Client> {
+    process.stdout.write('• Prepare SSH connection... ');
+
     const serversChain: ServerOptions[] = (() => {
       const result: ServerOptions[] = [];
       const addServerToChain = (server: ServerOptions) => {
@@ -156,6 +168,8 @@ export class Delivery {
         });
     });
 
+    process.stdout.write('DONE\n');
+
     return sshConnection;
   }
 
@@ -163,13 +177,15 @@ export class Delivery {
    * Подготовить архив для загрузки
    * @param taskOptions
    */
-  prepareUploadArchive(taskOptions: TaskOptions): Promise<string> {
+  async prepareUploadArchive(taskOptions: TaskOptions): Promise<string> {
+    process.stdout.write('• Prepare archive... ');
+
     const archivePath = path.resolve(process.cwd(), `${makeRandomFileName()}.tgz`);
     const srcPath = path.resolve(taskOptions.src.path);
 
     // TODO проверить если srcPath это файл
 
-    return new Promise((resolve, reject) => {
+    const result = await new Promise<string>((resolve, reject) => {
       tar.c(
         {
           gzip: true,
@@ -185,6 +201,10 @@ export class Delivery {
         },
       );
     });
+
+    process.stdout.write('DONE\n');
+
+    return result;
   }
 
   /**
@@ -193,8 +213,9 @@ export class Delivery {
    * @param srcPath
    * @param dstPath
    */
-  uploadFile({ sshConnection, srcPath, dstPath }: { sshConnection: Client; srcPath: string; dstPath: string }) {
-    return new Promise<void>((resolve, reject) => {
+  async uploadFile({ sshConnection, srcPath, dstPath }: { sshConnection: Client; srcPath: string; dstPath: string }) {
+    process.stdout.write('• Upload archive... ');
+    await new Promise<void>((resolve, reject) => {
       sshConnection.sftp((err, sftp) => {
         if (err) {
           return reject(err);
@@ -210,6 +231,7 @@ export class Delivery {
         readStream.pipe(writeStream);
       });
     });
+    process.stdout.write('DONE\n');
   }
 
   unpackArchiveOnRemoteServer({
@@ -221,6 +243,7 @@ export class Delivery {
     archivePath: string;
     dstPath: string;
   }) {
+    process.stdout.write('• Unpack archive on server: \n');
     return new Promise<void>((resolve, reject) => {
       sshConnection.exec(
         `\
@@ -228,7 +251,7 @@ mkdir -p ${dstPath} && \
 umask 0000 && \
 mkdir -p ${archivePath}_extr
 tar zxf ${archivePath} -C ${archivePath}_extr && \
-cp ${archivePath}_extr/* ${dstPath} && \
+cp -r ${archivePath}_extr/* ${dstPath} && \
 rm ${archivePath}* -rf &&
 echo ${dstPath} && \
 ls -alh ${dstPath} \
