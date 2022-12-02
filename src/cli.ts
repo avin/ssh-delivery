@@ -59,6 +59,7 @@ void (async () => {
     const delivery = new Delivery(config);
     await delivery.run(taskName);
     console.info('\n• Delivery successfully done!\n');
+    process.exit(0);
   } catch (e) {
     console.error('!!!', (e as Error)?.message || e);
     process.exit(1);

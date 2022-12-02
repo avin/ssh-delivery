@@ -56,7 +56,6 @@ export class Delivery {
     });
 
     fs.unlinkSync(uploadingArchivePath);
-    dstSshConnection.end();
 
     if (taskOptions.after) {
       await this.runShellCommands(taskOptions.after.run);
