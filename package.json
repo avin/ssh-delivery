@@ -1,6 +1,6 @@
 {
   "name": "ssh-delivery",
-  "version": "0.2.3",
+  "version": "0.2.7",
   "author": "Avin Lambrero",
   "main": "./dist/index.js",
   "bin": {
