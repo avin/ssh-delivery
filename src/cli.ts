@@ -9,7 +9,15 @@ import yargs from 'yargs/yargs';
 import { validateConfig } from './validation';
 import merge from 'lodash/merge';
 
-const defaultConfigNames = ['.deliveryrc', '.deliveryrc.js', '.delivery.config.js', 'delivery.config.js'];
+const defaultConfigNames = [
+  '.deliveryrc',
+  '.deliveryrc.js',
+  '.deliveryrc.cjs',
+  '.delivery.config.js',
+  'delivery.config.js',
+  '.delivery.config.cjs',
+  'delivery.config.cjs',
+];
 
 void (async () => {
   try {
