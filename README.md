@@ -32,6 +32,12 @@ module.exports = {
       host: 'gate.myweb.com',
       username: 'root',
       password: 'secret',
+      // Optional: Socks5 proxy settings for connecting to the first SSH server in the chain
+      socksProxyHost: '127.0.0.1',
+      socksProxyPort: 1080,
+      // socksProxyUsername and socksProxyPassword are optional if your proxy requires authentication
+      // socksProxyUsername: 'proxyUser',
+      // socksProxyPassword: 'proxyPass',
     },
     web: {
       host: 'myweb.com',
@@ -85,6 +91,11 @@ module.exports = {
       host: 'gate.myweb.com',
       username: 'root',
       password: 'secret',
+      // Optional Socks5 proxy settings:
+      // socksProxyHost: '127.0.0.1',
+      // socksProxyPort: 1080,
+      // socksProxyUsername: 'proxyUser',
+      // socksProxyPassword: 'proxyPass',
     },
     web: {
       host: 'myweb.com',

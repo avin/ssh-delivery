@@ -1,6 +1,13 @@
 import { ConnectConfig } from 'ssh2';
 
-export type ServerOptions = ConnectConfig & { name: string; via?: string };
+export type ServerOptions = ConnectConfig & {
+  name: string;
+  via?: string;
+  socksProxyHost?: string;
+  socksProxyPort?: number;
+  socksProxyUsername?: string;
+  socksProxyPassword?: string;
+};
 
 export type TaskOptions = {
   name: string;
