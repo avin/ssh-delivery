@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { DeliveryOptions, ServerOptions, TaskOptions } from './types';
 import createTunnel from './tunnel';
 import { Server as NetServer } from 'net';
@@ -145,8 +147,11 @@ export class Delivery {
           dstPort: targetServer.port,
           localHost: '127.0.0.1',
           localPort: 0,
+          socksProxyHost: gateServer.socksProxyHost,
+          socksProxyPort: gateServer.socksProxyPort,
+          socksProxyUsername: gateServer.socksProxyUsername,
+          socksProxyPassword: gateServer.socksProxyPassword,
         });
-
         tunnelsChain.push(tunnel);
       }
 
@@ -160,11 +165,37 @@ export class Delivery {
     await new Promise<void>((resolve, reject) => {
       sshConnection
         .on('ready', () => resolve())
-        // TODO on fail
-        .connect({
-          ...serverOptions,
-          ...dstConnectionTarget,
-        });
+        .on('error', reject);
+      const connectionOptions: any = {
+        ...serverOptions,
+        ...dstConnectionTarget,
+      };
+      if (serverOptions.socksProxyHost && serverOptions.socksProxyPort) {
+        const { SocksClient } = require('socks');
+        const socksOptions = {
+          proxy: {
+            host: serverOptions.socksProxyHost,
+            port: serverOptions.socksProxyPort,
+            type: 5,
+            userId: serverOptions.socksProxyUsername,
+            password: serverOptions.socksProxyPassword,
+          },
+          command: 'connect',
+          destination: {
+            host: serverOptions.host,
+            port: serverOptions.port,
+          },
+          timeout: 10000,
+        };
+        SocksClient.createConnection(socksOptions)
+          .then((info: any) => {
+            connectionOptions.sock = info.socket;
+            sshConnection.connect(connectionOptions);
+          })
+          .catch(reject);
+      } else {
+        sshConnection.connect(connectionOptions);
+      }
     });
 
     process.stdout.write('DONE\n');
@@ -197,7 +228,7 @@ export class Delivery {
             return reject(err);
           }
           return resolve(archivePath);
-        },
+        }
       );
     });
 
@@ -245,16 +276,14 @@ export class Delivery {
     process.stdout.write('• Unpack archive on server: \n');
     return new Promise<void>((resolve, reject) => {
       sshConnection.exec(
-        `\
-mkdir -p ${dstPath} && \
+        `mkdir -p ${dstPath} && \
 umask 0000 && \
 mkdir -p ${archivePath}_extr
 tar zxf ${archivePath} -C ${archivePath}_extr && \
 cp -r ${archivePath}_extr/* ${dstPath} && \
 rm ${archivePath}* -rf &&
 echo ${dstPath} && \
-ls -alh ${dstPath} \
-`,
+ls -alh ${dstPath} `,
         (err, stream) => {
           if (err) {
             return reject(err);
@@ -269,7 +298,7 @@ ls -alh ${dstPath} \
             .stderr.on('data', (data: string) => {
               process.stderr.write(data);
             });
-        },
+        }
       );
     });
   }

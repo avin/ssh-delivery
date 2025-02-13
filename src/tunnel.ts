@@ -10,6 +10,10 @@ type TunnelConfig = ConnectConfig & {
   localPort: number;
   srcHost: string;
   srcPort: number;
+  socksProxyHost?: string;
+  socksProxyPort?: number;
+  socksProxyUsername?: string;
+  socksProxyPassword?: string;
 };
 
 function bindSSHConnection(config: TunnelConfig, netConnection: Socket): Client {
@@ -72,10 +76,42 @@ function createServer(config: TunnelConfig): Server {
     });
 
     connections.push(sshConnection, netConnection);
-    try {
-      sshConnection.connect(omit(config, ['localPort', 'localHost']));
-    } catch (error) {
-      server.emit('error', error);
+    const connectConfig: any = omit(config, ['localPort', 'localHost']);
+    if (config.socksProxyHost && config.socksProxyPort) {
+      const { SocksClient } = require('socks');
+      const socksOptions = {
+        proxy: {
+          host: config.socksProxyHost,
+          port: config.socksProxyPort,
+          type: 5,
+          userId: config.socksProxyUsername,
+          password: config.socksProxyPassword,
+        },
+        command: 'connect',
+        destination: {
+          host: config.host,
+          port: config.port,
+        },
+        timeout: 10000,
+      };
+      SocksClient.createConnection(socksOptions)
+        .then((info: any) => {
+          connectConfig.sock = info.socket;
+          try {
+            sshConnection.connect(connectConfig);
+          } catch (error) {
+            server.emit('error', error);
+          }
+        })
+        .catch((error: any) => {
+          server.emit('error', error);
+        });
+    } else {
+      try {
+        sshConnection.connect(connectConfig);
+      } catch (error) {
+        server.emit('error', error);
+      }
     }
   });
 
