@@ -24,7 +24,6 @@ function bindSSHConnection(config: TunnelConfig, netConnection: Socket): Client 
     netConnection.emit('sshConnection', sshConnection, netConnection);
     sshConnection.forwardOut(config.srcHost, config.srcPort, config.dstHost, config.dstPort, (err, sshStream) => {
       if (err) {
-        // Bubble up the error => netConnection => server
         netConnection.emit('error', err);
         return;
       }
@@ -77,6 +76,8 @@ function createServer(config: TunnelConfig): Server {
 
     connections.push(sshConnection, netConnection);
     const connectConfig: any = omit(config, ['localPort', 'localHost']);
+    connectConfig.hostVerifier = () => true;
+
     if (config.socksProxyHost && config.socksProxyPort) {
       const { SocksClient } = require('socks');
       const socksOptions = {

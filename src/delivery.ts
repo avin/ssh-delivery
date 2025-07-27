@@ -169,6 +169,7 @@ export class Delivery {
       const connectionOptions: any = {
         ...serverOptions,
         ...dstConnectionTarget,
+        hostVerifier: () => true,
       };
       if (serverOptions.socksProxyHost && serverOptions.socksProxyPort) {
         const { SocksClient } = require('socks');
