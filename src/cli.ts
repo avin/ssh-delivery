@@ -20,6 +20,38 @@ const defaultConfigNames = [
 ];
 
 void (async () => {
+  let delivery: Delivery | null = null;
+  let isShuttingDown = false;
+
+  const shutdown = async (signal: NodeJS.Signals) => {
+    if (isShuttingDown) {
+      return;
+    }
+    isShuttingDown = true;
+
+    process.stdout.write(`\n• ${signal} received. Stop delivery...\n`);
+
+    try {
+      if (delivery) {
+        await delivery.abort();
+      }
+    } catch (e) {
+      console.error('!!!', (e as Error)?.message || e);
+    } finally {
+      process.exit(signal === 'SIGINT' ? 130 : 143);
+    }
+  };
+
+  const onSigInt = () => {
+    void shutdown('SIGINT');
+  };
+  const onSigTerm = () => {
+    void shutdown('SIGTERM');
+  };
+
+  process.once('SIGINT', onSigInt);
+  process.once('SIGTERM', onSigTerm);
+
   try {
     const argv = await yargs(process.argv.slice(2)).options({
       config: { type: 'string', alias: 'c', default: defaultConfigNames },
@@ -64,12 +96,17 @@ void (async () => {
       return configObj;
     })();
 
-    const delivery = new Delivery(config);
+    delivery = new Delivery(config);
     await delivery.run(taskName);
     console.info('\n• Delivery successfully done!\n');
-    process.exit(0);
+    process.exitCode = 0;
   } catch (e) {
-    console.error('!!!', (e as Error)?.message || e);
-    process.exit(1);
+    if (!isShuttingDown) {
+      console.error('!!!', (e as Error)?.message || e);
+      process.exitCode = 1;
+    }
+  } finally {
+    process.removeListener('SIGINT', onSigInt);
+    process.removeListener('SIGTERM', onSigTerm);
   }
 })();

@@ -21,6 +21,7 @@ delivery.config.js
 
 ```js
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 module.exports = {
@@ -74,6 +75,15 @@ module.exports = {
       },
     },
   },
+
+  // Optional global SFTP upload stream tuning.
+  // Smaller values can help on lossy links or with PMTU/fragmentation issues,
+  // but may reduce upload throughput.
+  uploadTuning: {
+    // bytes; defaults from Node streams are used when omitted
+    readHighWaterMarkBytes: 16384,
+    writeHighWaterMarkBytes: 16384,
+  },
 };
 ```
 
@@ -106,6 +116,11 @@ module.exports = {
       via: 'gate', // Connection to this server will be made via 'gate' server
     },
   },
+  // Optional global SFTP upload stream tuning.
+  uploadTuning: {
+    readHighWaterMarkBytes: 16384,
+    writeHighWaterMarkBytes: 16384,
+  },
 }
 ```
 
@@ -126,3 +141,14 @@ delivery deployToWebServer -c ./custom-config.js
 ```
 
 You can keep servers options with credentials in separate config
+
+## Network Notes
+
+Use SFTP stream buffer tuning when the route is unstable (for example, packet loss on VPN)
+or when there are PMTU/fragmentation issues:
+
+- `uploadTuning.readHighWaterMarkBytes`
+- `uploadTuning.writeHighWaterMarkBytes`
+
+If VPN path has PMTU issues, try lowering `readHighWaterMarkBytes` and `writeHighWaterMarkBytes`
+(for example to `16384` or `8192`).

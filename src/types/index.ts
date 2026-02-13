@@ -1,5 +1,12 @@
 import { ConnectConfig } from 'ssh2';
 
+export type UploadTuningOptions = {
+  // Local file read stream highWaterMark (bytes)
+  readHighWaterMarkBytes?: number;
+  // Remote SFTP write stream highWaterMark (bytes)
+  writeHighWaterMarkBytes?: number;
+};
+
 export type ServerOptions = ConnectConfig & {
   name: string;
   via?: string;
@@ -27,6 +34,7 @@ export type TaskOptions = {
 };
 
 export type DeliveryOptions = {
+  uploadTuning?: UploadTuningOptions;
   servers: Record<string, ServerOptions>;
   tasks: Record<string, TaskOptions>;
 };

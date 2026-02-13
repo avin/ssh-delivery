@@ -4,6 +4,21 @@ import revalidator from 'revalidator';
 export const validateConfig = (config: DeliveryOptions) => {
   return revalidator.validate(config, {
     properties: {
+      uploadTuning: {
+        description: 'Global SFTP upload stream tuning',
+        type: 'object',
+        required: false,
+        properties: {
+          readHighWaterMarkBytes: {
+            type: 'number',
+            required: false,
+          },
+          writeHighWaterMarkBytes: {
+            type: 'number',
+            required: false,
+          },
+        },
+      },
       servers: {
         description: 'Servers',
         type: 'object',
@@ -24,6 +39,26 @@ export const validateConfig = (config: DeliveryOptions) => {
             port: {
               description: 'Port',
               type: 'number',
+              required: false,
+            },
+            socksProxyHost: {
+              description: 'SOCKS5 proxy host',
+              type: 'string',
+              required: false,
+            },
+            socksProxyPort: {
+              description: 'SOCKS5 proxy port',
+              type: 'number',
+              required: false,
+            },
+            socksProxyUsername: {
+              description: 'SOCKS5 proxy username',
+              type: 'string',
+              required: false,
+            },
+            socksProxyPassword: {
+              description: 'SOCKS5 proxy password',
+              type: 'string',
               required: false,
             },
           },

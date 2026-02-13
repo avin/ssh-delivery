@@ -75,7 +75,18 @@ function createServer(config: TunnelConfig): Server {
     });
 
     connections.push(sshConnection, netConnection);
-    const connectConfig: any = omit(config, ['localPort', 'localHost']);
+    const connectConfig: any = omit(config, [
+      'localPort',
+      'localHost',
+      'dstHost',
+      'dstPort',
+      'srcHost',
+      'srcPort',
+      'socksProxyHost',
+      'socksProxyPort',
+      'socksProxyUsername',
+      'socksProxyPassword',
+    ]);
     connectConfig.hostVerifier = () => true;
 
     if (config.socksProxyHost && config.socksProxyPort) {
