@@ -5,3 +5,4 @@ node_modules
 exp
 files
 dist
+.delivery.config.js
